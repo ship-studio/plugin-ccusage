@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-last_updated: "2026-03-01T09:19:47.556Z"
+status: in_progress
+last_updated: "2026-03-01T09:43:00Z"
 progress:
-  total_phases: 1
+  total_phases: 3
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
+  total_plans: 5
+  completed_plans: 3
 ---
 
 # Project State
@@ -18,29 +18,30 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-01)
 
 **Core value:** Users can see their Claude Code spending at a glance — daily, weekly, and monthly — without leaving Ship Studio.
-**Current focus:** Phase 1 - Foundation
+**Current focus:** Phase 2 - Data + Toolbar
 
 ## Current Position
 
-Phase: 1 of 3 (Foundation)
-Plan: 2 of 3 in current phase
+Phase: 2 of 3 (Data + Toolbar)
+Plan: 1 of 2 in current phase (completed)
 Status: In progress
-Last activity: 2026-03-01 — Completed 01-02 (build dist/index.js and commit to git)
+Last activity: 2026-03-01 — Completed 02-01 (TypeScript types + useCcusageData hook)
 
-Progress: [██░░░░░░░░] 22%
+Progress: [███░░░░░░░] 33%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
+- Total plans completed: 3
 - Average duration: 2 min
-- Total execution time: 4 min
+- Total execution time: 5 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 2 | 4 min | 2 min |
+| 02-data-toolbar | 1 | 1 min | 1 min |
 
 **Recent Trend:**
 - Last 5 plans: 2 min
@@ -63,6 +64,9 @@ Recent decisions affecting current work:
 - [01-01]: React in peerDependencies only — prevents bundling host app React instance
 - [01-02]: dist/index.js committed to repository (1638 bytes) — Ship Studio can load plugin directly from git without npm build
 - [01-02]: package-lock.json committed for reproducible builds
+- [02-01]: Promise.allSettled (not Promise.all) ensures 1-2 failed calls don't drop successful data
+- [02-01]: Partial success sets status='success' with error message — UI can show data alongside a warning
+- [02-01]: storage.read() callback typed as Record<string, unknown> for strict TypeScript noImplicitAny
 
 ### Pending Todos
 
@@ -75,5 +79,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 01-02-PLAN.md (build dist/index.js and commit to git)
+Stopped at: Completed 02-01-PLAN.md (TypeScript interfaces + useCcusageData hook)
 Resume file: None

@@ -13,13 +13,13 @@
 
 ### Data
 
-- [ ] **DATA-01**: Plugin runs `npx ccusage daily --json` via shell.exec and parses the response
-- [ ] **DATA-02**: Plugin runs `npx ccusage weekly --json` via shell.exec and parses the response
-- [ ] **DATA-03**: Plugin runs `npx ccusage monthly --json` via shell.exec and parses the response
-- [ ] **DATA-04**: Parsed data includes per-period cost, input/output tokens, cache tokens, and models used
-- [ ] **DATA-05**: Last fetched results are cached in plugin storage so stale data shows immediately while refreshing
-- [ ] **DATA-06**: Loading state is shown while data is being fetched
-- [ ] **DATA-07**: Error state is shown with a clear message when ccusage fails (not installed, no data, etc.)
+- [x] **DATA-01**: Plugin runs `npx ccusage daily --json` via shell.exec and parses the response
+- [x] **DATA-02**: Plugin runs `npx ccusage weekly --json` via shell.exec and parses the response
+- [x] **DATA-03**: Plugin runs `npx ccusage monthly --json` via shell.exec and parses the response
+- [x] **DATA-04**: Parsed data includes per-period cost, input/output tokens, cache tokens, and models used
+- [x] **DATA-05**: Last fetched results are cached in plugin storage so stale data shows immediately while refreshing
+- [x] **DATA-06**: Loading state is shown while data is being fetched
+- [x] **DATA-07**: Error state is shown with a clear message when ccusage fails (not installed, no data, etc.)
 
 ### UI - Toolbar
 
@@ -70,13 +70,13 @@
 | SETUP-01 | Phase 1 | Complete |
 | SETUP-02 | Phase 1 | Complete |
 | SETUP-03 | Phase 1 | Complete |
-| DATA-01 | Phase 2 | Pending |
-| DATA-02 | Phase 2 | Pending |
-| DATA-03 | Phase 2 | Pending |
-| DATA-04 | Phase 2 | Pending |
-| DATA-05 | Phase 2 | Pending |
-| DATA-06 | Phase 2 | Pending |
-| DATA-07 | Phase 2 | Pending |
+| DATA-01 | Phase 2 | Complete |
+| DATA-02 | Phase 2 | Complete |
+| DATA-03 | Phase 2 | Complete |
+| DATA-04 | Phase 2 | Complete |
+| DATA-05 | Phase 2 | Complete |
+| DATA-06 | Phase 2 | Complete |
+| DATA-07 | Phase 2 | Complete |
 | TOOL-01 | Phase 2 | Pending |
 | TOOL-02 | Phase 2 | Pending |
 | MODAL-01 | Phase 3 | Pending |
@@ -97,4 +97,4 @@
 
 ---
 *Requirements defined: 2026-03-01*
-*Last updated: 2026-03-01 after 01-02 plan completion*
+*Last updated: 2026-03-01 after 02-01 plan completion*
