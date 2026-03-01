@@ -189,19 +189,165 @@ function useCcusageData() {
   return { data, status, error, fetchData };
 }
 
-function ToolbarButton() {
-  const [open, setOpen] = useState(false);
+const STYLE_ID = 'ccusage-plugin-styles';
+
+const pluginCSS = `
+.ccusage-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.ccusage-modal {
+  min-width: 400px;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+.ccusage-modal button {
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  margin-right: 8px;
+  margin-top: 12px;
+}
+.ccusage-modal button:hover {
+  opacity: 0.8;
+}
+`;
+
+function useInjectStyles() {
+  useEffect(() => {
+    if (document.getElementById(STYLE_ID)) return;
+    const style = document.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent = pluginCSS;
+    document.head.appendChild(style);
+    return () => { document.getElementById(STYLE_ID)?.remove(); };
+  }, []);
+}
+
+function UsageModal({
+  data,
+  status,
+  error,
+  onRefresh,
+  onClose,
+}: {
+  data: CcusageData | null;
+  status: FetchStatus;
+  error: string | null;
+  onRefresh: () => void;
+  onClose: () => void;
+}) {
+  const theme = useTheme();
+
+  // Close on Escape key
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [onClose]);
+
   return (
-    <button
-      className="toolbar-icon-btn"
-      title="CC Usage"
-      onClick={() => setOpen(true)}
-    >
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <circle cx="12" cy="12" r="10" />
-        <path d="M12 8v4M12 16h.01" />
-      </svg>
-    </button>
+    <div className="ccusage-overlay" onClick={onClose}>
+      <div
+        className="ccusage-modal"
+        style={{
+          background: theme.bgPrimary,
+          border: `1px solid ${theme.border}`,
+          color: theme.textPrimary,
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 style={{ margin: '0 0 12px 0' }}>CC Usage</h3>
+
+        {status === 'loading' && <div>Fetching usage data...</div>}
+
+        {status === 'error' && !data && (
+          <div style={{ color: theme.error }}>{error || 'An error occurred'}</div>
+        )}
+
+        {status === 'success' && data && (
+          <div>
+            <div>
+              {data.daily.length} day(s), {data.weekly.length} week(s), {data.monthly.length} month(s) loaded
+            </div>
+            {data.dailyTotals && (
+              <div style={{ marginTop: 8 }}>
+                Total cost: ${data.dailyTotals.totalCost.toFixed(2)}
+              </div>
+            )}
+            {error && (
+              <div style={{ color: theme.error, marginTop: 8, fontSize: '0.85em' }}>
+                {error}
+              </div>
+            )}
+          </div>
+        )}
+
+        {status === 'idle' && !data && (
+          <div style={{ color: theme.textSecondary }}>Click Refresh to load usage data.</div>
+        )}
+
+        <div>
+          <button onClick={onRefresh} disabled={status === 'loading'}>
+            {status === 'loading' ? 'Loading...' : 'Refresh'}
+          </button>
+          <button onClick={onClose}>Close</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ToolbarButton() {
+  const { data, status, error, fetchData } = useCcusageData();
+  const [open, setOpen] = useState(false);
+
+  useInjectStyles();
+
+  const handleClick = useCallback(() => {
+    setOpen(true);
+    if (status === 'idle' || status === 'error') {
+      fetchData();
+    }
+  }, [status, fetchData]);
+
+  return (
+    <>
+      <button
+        className="toolbar-icon-btn"
+        title="CC Usage"
+        onClick={handleClick}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="12" y1="1" x2="12" y2="23" />
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+        </svg>
+      </button>
+      {open && (
+        <UsageModal
+          data={data}
+          status={status}
+          error={error}
+          onRefresh={fetchData}
+          onClose={() => setOpen(false)}
+        />
+      )}
+    </>
   );
 }
 
