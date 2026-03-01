@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 const _w = window as any;
 
@@ -10,6 +10,66 @@ function usePluginContext() {
     if (ctx) return ctx;
   }
   throw new Error('Plugin context not available.');
+}
+
+interface ModelBreakdown {
+  modelName: string;
+  inputTokens: number;
+  outputTokens: number;
+  cacheCreationTokens: number;
+  cacheReadTokens: number;
+  cost: number;
+}
+
+interface DayEntry {
+  date: string;
+  inputTokens: number;
+  outputTokens: number;
+  cacheCreationTokens: number;
+  cacheReadTokens: number;
+  totalTokens: number;
+  totalCost: number;
+  modelsUsed: string[];
+  modelBreakdowns: ModelBreakdown[];
+}
+
+interface WeekEntry extends Omit<DayEntry, 'date'> { week: string; }
+interface MonthEntry extends Omit<DayEntry, 'date'> { month: string; }
+
+interface Totals {
+  inputTokens: number;
+  outputTokens: number;
+  cacheCreationTokens: number;
+  cacheReadTokens: number;
+  totalCost: number;
+  totalTokens: number;
+}
+
+interface CcusageData {
+  daily: DayEntry[];
+  weekly: WeekEntry[];
+  monthly: MonthEntry[];
+  dailyTotals?: Totals;
+  weeklyTotals?: Totals;
+  monthlyTotals?: Totals;
+  fetchedAt: number;
+}
+
+type FetchStatus = 'idle' | 'loading' | 'success' | 'error';
+
+function useShell() {
+  const ctx = usePluginContext();
+  return ctx.shell;
+}
+
+function usePluginStorage() {
+  const ctx = usePluginContext();
+  return ctx.storage;
+}
+
+function useTheme() {
+  const ctx = usePluginContext();
+  return ctx.theme;
 }
 
 function ToolbarButton() {
