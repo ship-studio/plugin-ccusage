@@ -9,7 +9,7 @@
 
 - [x] **SETUP-01**: Project is scaffolded from ship-studio/plugin-starter template (vite, tsconfig, plugin.json)
 - [x] **SETUP-02**: plugin.json configured with id, name, description, toolbar slot, and required permissions
-- [ ] **SETUP-03**: Vite build produces working dist/index.js committed to repo
+- [x] **SETUP-03**: Vite build produces working dist/index.js committed to repo
 
 ### Data
 
@@ -69,7 +69,7 @@
 |-------------|-------|--------|
 | SETUP-01 | Phase 1 | Complete |
 | SETUP-02 | Phase 1 | Complete |
-| SETUP-03 | Phase 1 | Pending |
+| SETUP-03 | Phase 1 | Complete |
 | DATA-01 | Phase 2 | Pending |
 | DATA-02 | Phase 2 | Pending |
 | DATA-03 | Phase 2 | Pending |
@@ -97,4 +97,4 @@
 
 ---
 *Requirements defined: 2026-03-01*
-*Last updated: 2026-03-01 after 01-01 plan completion*
+*Last updated: 2026-03-01 after 01-02 plan completion*

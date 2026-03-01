@@ -12,7 +12,7 @@ Three phases deliver a Ship Studio plugin that surfaces Claude Code usage data. 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - Scaffold the plugin from plugin-starter so it loads in Ship Studio with a committed dist/index.js
+- [x] **Phase 1: Foundation** - Scaffold the plugin from plugin-starter so it loads in Ship Studio with a committed dist/index.js
 - [ ] **Phase 2: Data + Toolbar** - Wire ccusage CLI via shell.exec, implement toolbar button, and handle all data states (loading, error, cached)
 - [ ] **Phase 3: Modal UI** - Build the full usage modal with tabbed daily/weekly/monthly views, refresh, and Ship Studio theming
 
@@ -30,7 +30,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01-PLAN.md — Scaffold all template files and configure plugin manifest (SETUP-01, SETUP-02)
-- [ ] 01-02-PLAN.md — Install dependencies, build dist/index.js, and commit to repository (SETUP-03)
+- [x] 01-02-PLAN.md — Install dependencies, build dist/index.js, and commit to repository (SETUP-03)
 
 ### Phase 2: Data + Toolbar
 **Goal**: The toolbar button appears in Ship Studio and clicking it fetches real usage data from ccusage via shell.exec, with loading, error, and cached states all handled
@@ -63,6 +63,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 1/2 | In progress | - |
+| 1. Foundation | 2/2 | Complete | 2026-03-01 |
 | 2. Data + Toolbar | 0/? | Not started | - |
 | 3. Modal UI | 0/? | Not started | - |
