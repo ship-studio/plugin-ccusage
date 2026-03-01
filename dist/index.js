@@ -21,6 +21,24 @@ function useTheme() {
   const ctx = usePluginContext();
   return (ctx == null ? void 0 : ctx.theme) ?? null;
 }
+function fmt(n) {
+  return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function fmtTokens(n) {
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + "k";
+  return String(n);
+}
+function shortModel(name2) {
+  return name2.replace("claude-", "").replace(/-\d{8}$/, "");
+}
+function timeAgo(ts) {
+  const diff = Math.floor((Date.now() - ts) / 1e3);
+  if (diff < 60) return "just now";
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  return `${Math.floor(diff / 86400)}d ago`;
+}
 function useCcusageData() {
   const shell = useShell();
   const storage = usePluginStorage();
@@ -68,11 +86,10 @@ function useCcusageData() {
           daily = parsed.daily ?? [];
           dailyTotals = parsed.totals;
         } catch (e) {
-          errors.push(`daily: Failed to parse JSON — ${String(e)}`);
+          errors.push(`daily: ${e}`);
         }
       } else {
-        const msg = dailyRes.status === "rejected" ? String(dailyRes.reason) : dailyRes.value.stderr || "Non-zero exit code";
-        errors.push(`daily: ${msg}`);
+        errors.push(`daily: ${dailyRes.status === "rejected" ? dailyRes.reason : dailyRes.value.stderr || "failed"}`);
       }
       if (weeklyRes.status === "fulfilled" && weeklyRes.value.exit_code === 0) {
         try {
@@ -80,11 +97,10 @@ function useCcusageData() {
           weekly = parsed.weekly ?? [];
           weeklyTotals = parsed.totals;
         } catch (e) {
-          errors.push(`weekly: Failed to parse JSON — ${String(e)}`);
+          errors.push(`weekly: ${e}`);
         }
       } else {
-        const msg = weeklyRes.status === "rejected" ? String(weeklyRes.reason) : weeklyRes.value.stderr || "Non-zero exit code";
-        errors.push(`weekly: ${msg}`);
+        errors.push(`weekly: ${weeklyRes.status === "rejected" ? weeklyRes.reason : weeklyRes.value.stderr || "failed"}`);
       }
       if (monthlyRes.status === "fulfilled" && monthlyRes.value.exit_code === 0) {
         try {
@@ -92,11 +108,10 @@ function useCcusageData() {
           monthly = parsed.monthly ?? [];
           monthlyTotals = parsed.totals;
         } catch (e) {
-          errors.push(`monthly: Failed to parse JSON — ${String(e)}`);
+          errors.push(`monthly: ${e}`);
         }
       } else {
-        const msg = monthlyRes.status === "rejected" ? String(monthlyRes.reason) : monthlyRes.value.stderr || "Non-zero exit code";
-        errors.push(`monthly: ${msg}`);
+        errors.push(`monthly: ${monthlyRes.status === "rejected" ? monthlyRes.reason : monthlyRes.value.stderr || "failed"}`);
       }
       if (errors.length === 3) {
         setStatus("error");
@@ -114,10 +129,8 @@ function useCcusageData() {
       };
       setData(newData);
       setStatus("success");
-      if (errors.length > 0) {
-        setError(`Partial failure:
+      if (errors.length > 0) setError(`Partial failure:
 ${errors.join("\n")}`);
-      }
       if (storage) await storage.write({ ccusageData: newData });
     } catch (err) {
       setStatus("error");
@@ -128,39 +141,204 @@ ${errors.join("\n")}`);
 }
 const STYLE_ID = "ccusage-plugin-styles";
 const pluginCSS = `
+@keyframes ccusage-fadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
 .ccusage-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 10000;
+  animation: ccusage-fadeIn 0.15s ease-out;
 }
 .ccusage-modal {
-  min-width: 400px;
-  max-width: 600px;
+  width: 520px;
   max-height: 80vh;
-  overflow-y: auto;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  animation: ccusage-fadeIn 0.2s ease-out;
 }
-.ccusage-modal button {
-  cursor: pointer;
-  padding: 6px 12px;
-  border-radius: 4px;
-  border: 1px solid currentColor;
-  background: transparent;
+.ccusage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.ccusage-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ccusage-close {
+  background: none;
+  border: none;
   color: inherit;
-  margin-right: 8px;
-  margin-top: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 6px;
+  opacity: 0.4;
+  line-height: 1;
+  border-radius: 4px;
 }
-.ccusage-modal button:hover {
+.ccusage-close:hover {
   opacity: 0.8;
+  background: rgba(255, 255, 255, 0.06);
+}
+.ccusage-tabs {
+  display: flex;
+  gap: 0;
+  padding: 0 16px;
+}
+.ccusage-tab {
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  background: none !important;
+  border: none !important;
+  border-bottom: 2px solid transparent !important;
+  margin-bottom: -1px;
+  opacity: 0.4;
+  transition: opacity 0.15s, border-color 0.15s;
+  color: inherit;
+}
+.ccusage-tab:hover { opacity: 0.7; }
+.ccusage-tab--active {
+  opacity: 1;
+  border-bottom-color: var(--accent) !important;
+  color: var(--accent);
+}
+.ccusage-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px;
+}
+.ccusage-footer {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+}
+.ccusage-refresh {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: filter 0.12s, opacity 0.12s;
+}
+.ccusage-refresh:hover { filter: brightness(0.9); }
+.ccusage-refresh:disabled { opacity: 0.5; cursor: not-allowed; }
+.ccusage-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+.ccusage-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  transition: background 0.1s;
+}
+.ccusage-row:hover { filter: brightness(1.1); }
+.ccusage-row-date {
+  width: 90px;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+.ccusage-row-cost {
+  width: 70px;
+  text-align: right;
+  font-family: monospace;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.ccusage-row-tokens {
+  flex: 1;
+  text-align: right;
+  font-family: monospace;
+  font-size: 11px;
+}
+.ccusage-row-bar {
+  width: 60px;
+  height: 4px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  margin-left: 12px;
+  overflow: hidden;
+}
+.ccusage-row-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+.ccusage-totals {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.ccusage-stat {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+}
+.ccusage-stat-value {
+  font-size: 18px;
+  font-weight: 700;
+  font-family: monospace;
+}
+.ccusage-stat-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+.ccusage-model-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  margin-right: 4px;
+  margin-bottom: 4px;
+}
+.ccusage-empty {
+  text-align: center;
+  padding: 32px 0;
+  font-size: 12px;
+  opacity: 0.5;
+}
+@keyframes ccusage-spin {
+  to { transform: rotate(360deg); }
+}
+.ccusage-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: ccusage-spin 0.8s linear infinite;
 }
 `;
 function useInjectStyles() {
@@ -176,6 +354,94 @@ function useInjectStyles() {
     };
   }, []);
 }
+function TotalsCards({ totals, theme }) {
+  return /* @__PURE__ */ jsxs("div", { className: "ccusage-totals", children: [
+    /* @__PURE__ */ jsxs("div", { className: "ccusage-stat", style: { background: theme.bgTertiary }, children: [
+      /* @__PURE__ */ jsxs("div", { className: "ccusage-stat-value", style: { color: theme.accent }, children: [
+        "$",
+        fmt(totals.totalCost)
+      ] }),
+      /* @__PURE__ */ jsx("div", { className: "ccusage-stat-label", style: { color: theme.textMuted }, children: "Total Cost" })
+    ] }),
+    /* @__PURE__ */ jsxs("div", { className: "ccusage-stat", style: { background: theme.bgTertiary }, children: [
+      /* @__PURE__ */ jsx("div", { className: "ccusage-stat-value", style: { color: theme.textPrimary }, children: fmtTokens(totals.totalTokens) }),
+      /* @__PURE__ */ jsx("div", { className: "ccusage-stat-label", style: { color: theme.textMuted }, children: "Tokens" })
+    ] }),
+    /* @__PURE__ */ jsxs("div", { className: "ccusage-stat", style: { background: theme.bgTertiary }, children: [
+      /* @__PURE__ */ jsx("div", { className: "ccusage-stat-value", style: { color: theme.textPrimary }, children: fmtTokens(totals.cacheReadTokens) }),
+      /* @__PURE__ */ jsx("div", { className: "ccusage-stat-label", style: { color: theme.textMuted }, children: "Cache Hits" })
+    ] })
+  ] });
+}
+function EntryRow({
+  label,
+  cost,
+  tokens,
+  maxCost,
+  theme,
+  models
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const barPct = maxCost > 0 ? Math.max(2, cost / maxCost * 100) : 0;
+  return /* @__PURE__ */ jsxs(Fragment, { children: [
+    /* @__PURE__ */ jsxs(
+      "div",
+      {
+        className: "ccusage-row",
+        style: { background: theme.bgSecondary, cursor: models.length > 0 ? "pointer" : "default" },
+        onClick: () => models.length > 0 && setExpanded(!expanded),
+        children: [
+          /* @__PURE__ */ jsx("div", { className: "ccusage-row-date", style: { color: theme.textPrimary }, children: label }),
+          /* @__PURE__ */ jsx("div", { className: "ccusage-row-tokens", style: { color: theme.textMuted }, children: fmtTokens(tokens) }),
+          /* @__PURE__ */ jsxs("div", { className: "ccusage-row-cost", style: { color: theme.accent }, children: [
+            "$",
+            fmt(cost)
+          ] }),
+          /* @__PURE__ */ jsx("div", { className: "ccusage-row-bar", style: { background: theme.bgTertiary }, children: /* @__PURE__ */ jsx("div", { className: "ccusage-row-bar-fill", style: { width: `${barPct}%`, background: theme.accent } }) })
+        ]
+      }
+    ),
+    expanded && models.length > 0 && /* @__PURE__ */ jsx("div", { style: { padding: "4px 12px 8px 24px" }, children: models.map((m) => /* @__PURE__ */ jsxs("div", { style: { display: "flex", justifyContent: "space-between", padding: "3px 0", fontSize: "11px" }, children: [
+      /* @__PURE__ */ jsx("span", { className: "ccusage-model-tag", style: { background: theme.bgTertiary, color: theme.textSecondary }, children: shortModel(m.modelName) }),
+      /* @__PURE__ */ jsxs("span", { style: { fontFamily: "monospace", color: theme.textSecondary }, children: [
+        "$",
+        fmt(m.cost)
+      ] })
+    ] }, m.modelName)) })
+  ] });
+}
+function TabContent({ data, tab, theme }) {
+  const entries = tab === "daily" ? data.daily : tab === "weekly" ? data.weekly : data.monthly;
+  const totals = tab === "daily" ? data.dailyTotals : tab === "weekly" ? data.weeklyTotals : data.monthlyTotals;
+  if (entries.length === 0) {
+    return /* @__PURE__ */ jsxs("div", { className: "ccusage-empty", children: [
+      "No ",
+      tab,
+      " data available."
+    ] });
+  }
+  const maxCost = Math.max(...entries.map((e) => e.totalCost));
+  const recent = [...entries].reverse().slice(0, 30);
+  return /* @__PURE__ */ jsxs(Fragment, { children: [
+    totals && /* @__PURE__ */ jsx(TotalsCards, { totals, theme }),
+    /* @__PURE__ */ jsx("div", { className: "ccusage-section-title", style: { color: theme.textMuted }, children: tab === "daily" ? "Recent Days" : tab === "weekly" ? "Recent Weeks" : "Recent Months" }),
+    recent.map((entry) => {
+      const label = "date" in entry ? entry.date.slice(5) : "week" in entry ? entry.week : entry.month;
+      return /* @__PURE__ */ jsx(
+        EntryRow,
+        {
+          label,
+          cost: entry.totalCost,
+          tokens: entry.totalTokens,
+          maxCost,
+          theme,
+          models: entry.modelBreakdowns
+        },
+        label
+      );
+    })
+  ] });
+}
 function UsageModal({
   data,
   status,
@@ -186,11 +452,20 @@ function UsageModal({
   const themeRaw = useTheme();
   const theme = themeRaw ?? {
     bgPrimary: "#1e1e1e",
+    bgSecondary: "#252525",
+    bgTertiary: "#2d2d2d",
     textPrimary: "#cccccc",
     textSecondary: "#999999",
+    textMuted: "#666666",
     border: "#404040",
-    error: "#f44747"
+    accent: "#007acc",
+    accentHover: "#005a9e",
+    action: "#007acc",
+    actionText: "#ffffff",
+    error: "#f44747",
+    success: "#89d185"
   };
+  const [tab, setTab] = useState("daily");
   useEffect(() => {
     const handler = (e) => {
       if (e.key === "Escape") onClose();
@@ -198,39 +473,63 @@ function UsageModal({
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
+  const tabs = [
+    { key: "daily", label: "Daily" },
+    { key: "weekly", label: "Weekly" },
+    { key: "monthly", label: "Monthly" }
+  ];
   return /* @__PURE__ */ jsx("div", { className: "ccusage-overlay", onClick: onClose, children: /* @__PURE__ */ jsxs(
     "div",
     {
       className: "ccusage-modal",
-      style: {
-        background: theme.bgPrimary,
-        border: `1px solid ${theme.border}`,
-        color: theme.textPrimary
-      },
+      style: { background: theme.bgPrimary, border: `1px solid ${theme.border}`, color: theme.textPrimary },
       onClick: (e) => e.stopPropagation(),
       children: [
-        /* @__PURE__ */ jsx("h3", { style: { margin: "0 0 12px 0" }, children: "CC Usage" }),
-        status === "loading" && /* @__PURE__ */ jsx("div", { children: "Fetching usage data..." }),
-        status === "error" && !data && /* @__PURE__ */ jsx("div", { style: { color: theme.error }, children: error || "An error occurred" }),
-        status === "success" && data && /* @__PURE__ */ jsxs("div", { children: [
-          /* @__PURE__ */ jsxs("div", { children: [
-            data.daily.length,
-            " day(s), ",
-            data.weekly.length,
-            " week(s), ",
-            data.monthly.length,
-            " month(s) loaded"
+        /* @__PURE__ */ jsxs("div", { className: "ccusage-header", style: { borderBottom: `1px solid ${theme.border}` }, children: [
+          /* @__PURE__ */ jsxs("div", { className: "ccusage-header-left", children: [
+            /* @__PURE__ */ jsxs("svg", { width: 14, height: 14, viewBox: "0 0 24 24", fill: "none", stroke: theme.accent, strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+              /* @__PURE__ */ jsx("line", { x1: "18", y1: "20", x2: "18", y2: "10" }),
+              /* @__PURE__ */ jsx("line", { x1: "12", y1: "20", x2: "12", y2: "4" }),
+              /* @__PURE__ */ jsx("line", { x1: "6", y1: "20", x2: "6", y2: "14" })
+            ] }),
+            "CC Usage"
           ] }),
-          data.dailyTotals && /* @__PURE__ */ jsxs("div", { style: { marginTop: 8 }, children: [
-            "Total cost: $",
-            data.dailyTotals.totalCost.toFixed(2)
-          ] }),
-          error && /* @__PURE__ */ jsx("div", { style: { color: theme.error, marginTop: 8, fontSize: "0.85em" }, children: error })
+          /* @__PURE__ */ jsx("button", { className: "ccusage-close", onClick: onClose, children: "✕" })
         ] }),
-        status === "idle" && !data && /* @__PURE__ */ jsx("div", { style: { color: theme.textSecondary }, children: "Click Refresh to load usage data." }),
-        /* @__PURE__ */ jsxs("div", { children: [
-          /* @__PURE__ */ jsx("button", { onClick: onRefresh, disabled: status === "loading", children: status === "loading" ? "Loading..." : "Refresh" }),
-          /* @__PURE__ */ jsx("button", { onClick: onClose, children: "Close" })
+        status === "success" && data && /* @__PURE__ */ jsx("div", { className: "ccusage-tabs", style: { borderBottom: `1px solid ${theme.border}` }, children: tabs.map((t) => /* @__PURE__ */ jsx(
+          "button",
+          {
+            className: `ccusage-tab ${tab === t.key ? "ccusage-tab--active" : ""}`,
+            style: { color: tab === t.key ? theme.accent : theme.textSecondary },
+            onClick: () => setTab(t.key),
+            children: t.label
+          },
+          t.key
+        )) }),
+        /* @__PURE__ */ jsxs("div", { className: "ccusage-body", children: [
+          status === "loading" && /* @__PURE__ */ jsxs("div", { style: { textAlign: "center", padding: "40px 0", color: theme.textMuted }, children: [
+            /* @__PURE__ */ jsx("div", { className: "ccusage-spinner", style: { borderTopColor: theme.accent } }),
+            /* @__PURE__ */ jsx("div", { style: { marginTop: 12, fontSize: 12 }, children: "Fetching usage data..." })
+          ] }),
+          status === "error" && !data && /* @__PURE__ */ jsx("div", { style: { background: `${theme.error}15`, color: theme.error, padding: "12px 14px", borderRadius: 6, fontSize: 12 }, children: error || "Failed to fetch usage data." }),
+          status === "success" && data && /* @__PURE__ */ jsxs(Fragment, { children: [
+            /* @__PURE__ */ jsx(TabContent, { data, tab, theme }),
+            error && /* @__PURE__ */ jsx("div", { style: { background: `${theme.error}15`, color: theme.error, padding: "8px 12px", borderRadius: 6, fontSize: 11, marginTop: 12 }, children: error })
+          ] }),
+          status === "idle" && !data && /* @__PURE__ */ jsx("div", { className: "ccusage-empty", style: { color: theme.textMuted }, children: "Click Refresh to load your Claude Code usage data." })
+        ] }),
+        /* @__PURE__ */ jsxs("div", { className: "ccusage-footer", style: { borderTop: `1px solid ${theme.border}` }, children: [
+          /* @__PURE__ */ jsx("span", { style: { color: theme.textMuted }, children: (data == null ? void 0 : data.fetchedAt) ? `Updated ${timeAgo(data.fetchedAt)}` : "Not yet loaded" }),
+          /* @__PURE__ */ jsx(
+            "button",
+            {
+              className: "ccusage-refresh",
+              style: { background: theme.action, color: theme.actionText },
+              onClick: onRefresh,
+              disabled: status === "loading",
+              children: status === "loading" ? "Loading..." : "Refresh"
+            }
+          )
         ] })
       ]
     }
@@ -247,18 +546,11 @@ function ToolbarButton() {
     }
   }, [status, fetchData]);
   return /* @__PURE__ */ jsxs(Fragment, { children: [
-    /* @__PURE__ */ jsx(
-      "button",
-      {
-        className: "toolbar-icon-btn",
-        title: "CC Usage",
-        onClick: handleClick,
-        children: /* @__PURE__ */ jsxs("svg", { width: "14", height: "14", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-          /* @__PURE__ */ jsx("line", { x1: "12", y1: "1", x2: "12", y2: "23" }),
-          /* @__PURE__ */ jsx("path", { d: "M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" })
-        ] })
-      }
-    ),
+    /* @__PURE__ */ jsx("button", { className: "toolbar-icon-btn", title: "CC Usage", onClick: handleClick, children: /* @__PURE__ */ jsxs("svg", { width: "14", height: "14", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+      /* @__PURE__ */ jsx("line", { x1: "18", y1: "20", x2: "18", y2: "10" }),
+      /* @__PURE__ */ jsx("line", { x1: "12", y1: "20", x2: "12", y2: "4" }),
+      /* @__PURE__ */ jsx("line", { x1: "6", y1: "20", x2: "6", y2: "14" })
+    ] }) }),
     open && /* @__PURE__ */ jsx(
       UsageModal,
       {
