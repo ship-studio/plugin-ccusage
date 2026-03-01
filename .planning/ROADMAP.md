@@ -42,7 +42,11 @@ Plans:
   3. Parsed data includes cost, input/output tokens, cache tokens, and models used for each period
   4. A loading indicator is visible while shell.exec is running
   5. When ccusage fails or returns no data, a clear error message is shown instead of crashing
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Implement ccusage data layer: TypeScript types, useCcusageData hook with shell.exec, JSON parsing, and storage caching (DATA-01, DATA-02, DATA-03, DATA-04, DATA-05, DATA-06, DATA-07)
+- [ ] 02-02-PLAN.md — Replace toolbar icon with dollar-sign, add modal stub with data states, wire click-to-open, inject CSS, and rebuild dist/index.js (TOOL-01, TOOL-02)
 
 ### Phase 3: Modal UI
 **Goal**: Users can view daily, weekly, and monthly usage data in a polished modal that matches Ship Studio's design and handles all interaction patterns
@@ -64,5 +68,5 @@ Phases execute in numeric order: 1 → 2 → 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete | 2026-03-01 |
-| 2. Data + Toolbar | 0/? | Not started | - |
+| 2. Data + Toolbar | 0/2 | Not started | - |
 | 3. Modal UI | 0/? | Not started | - |
