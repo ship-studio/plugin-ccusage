@@ -5,22 +5,21 @@ function usePluginContext() {
   const React = _w.__SHIPSTUDIO_REACT__;
   const CtxRef = _w.__SHIPSTUDIO_PLUGIN_CONTEXT_REF__;
   if (CtxRef && (React == null ? void 0 : React.useContext)) {
-    const ctx = React.useContext(CtxRef);
-    if (ctx) return ctx;
+    return React.useContext(CtxRef);
   }
-  throw new Error("Plugin context not available.");
+  return null;
 }
 function useShell() {
   const ctx = usePluginContext();
-  return ctx.shell;
+  return (ctx == null ? void 0 : ctx.shell) ?? null;
 }
 function usePluginStorage() {
   const ctx = usePluginContext();
-  return ctx.storage;
+  return (ctx == null ? void 0 : ctx.storage) ?? null;
 }
 function useTheme() {
   const ctx = usePluginContext();
-  return ctx.theme;
+  return (ctx == null ? void 0 : ctx.theme) ?? null;
 }
 function useCcusageData() {
   const shell = useShell();
@@ -29,14 +28,20 @@ function useCcusageData() {
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState(null);
   useEffect(() => {
+    if (!storage) return;
     storage.read().then((stored) => {
       if (stored.ccusageData) {
         setData(stored.ccusageData);
         setStatus("success");
       }
     });
-  }, []);
+  }, [storage]);
   const fetchData = useCallback(async () => {
+    if (!shell) {
+      setStatus("error");
+      setError("Plugin context not available. Try reloading the plugin.");
+      return;
+    }
     setStatus("loading");
     setError(null);
     try {
@@ -113,7 +118,7 @@ function useCcusageData() {
         setError(`Partial failure:
 ${errors.join("\n")}`);
       }
-      await storage.write({ ccusageData: newData });
+      if (storage) await storage.write({ ccusageData: newData });
     } catch (err) {
       setStatus("error");
       setError(String(err));
@@ -178,7 +183,14 @@ function UsageModal({
   onRefresh,
   onClose
 }) {
-  const theme = useTheme();
+  const themeRaw = useTheme();
+  const theme = themeRaw ?? {
+    bgPrimary: "#1e1e1e",
+    textPrimary: "#cccccc",
+    textSecondary: "#999999",
+    border: "#404040",
+    error: "#f44747"
+  };
   useEffect(() => {
     const handler = (e) => {
       if (e.key === "Escape") onClose();

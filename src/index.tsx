@@ -6,10 +6,9 @@ function usePluginContext() {
   const React = _w.__SHIPSTUDIO_REACT__;
   const CtxRef = _w.__SHIPSTUDIO_PLUGIN_CONTEXT_REF__;
   if (CtxRef && React?.useContext) {
-    const ctx = React.useContext(CtxRef);
-    if (ctx) return ctx;
+    return React.useContext(CtxRef) as any | null;
   }
-  throw new Error('Plugin context not available.');
+  return null;
 }
 
 interface ModelBreakdown {
@@ -59,17 +58,17 @@ type FetchStatus = 'idle' | 'loading' | 'success' | 'error';
 
 function useShell() {
   const ctx = usePluginContext();
-  return ctx.shell;
+  return ctx?.shell ?? null;
 }
 
 function usePluginStorage() {
   const ctx = usePluginContext();
-  return ctx.storage;
+  return ctx?.storage ?? null;
 }
 
 function useTheme() {
   const ctx = usePluginContext();
-  return ctx.theme;
+  return ctx?.theme ?? null;
 }
 
 function useCcusageData() {
@@ -81,15 +80,21 @@ function useCcusageData() {
 
   // Restore cache on mount
   useEffect(() => {
+    if (!storage) return;
     storage.read().then((stored: Record<string, unknown>) => {
       if (stored.ccusageData) {
         setData(stored.ccusageData as CcusageData);
         setStatus('success');
       }
     });
-  }, []);
+  }, [storage]);
 
   const fetchData = useCallback(async () => {
+    if (!shell) {
+      setStatus('error');
+      setError('Plugin context not available. Try reloading the plugin.');
+      return;
+    }
     setStatus('loading');
     setError(null);
     try {
@@ -179,7 +184,7 @@ function useCcusageData() {
       if (errors.length > 0) {
         setError(`Partial failure:\n${errors.join('\n')}`);
       }
-      await storage.write({ ccusageData: newData });
+      if (storage) await storage.write({ ccusageData: newData });
     } catch (err) {
       setStatus('error');
       setError(String(err));
@@ -252,7 +257,12 @@ function UsageModal({
   onRefresh: () => void;
   onClose: () => void;
 }) {
-  const theme = useTheme();
+  const themeRaw = useTheme();
+  const theme = themeRaw ?? {
+    bgPrimary: '#1e1e1e', bgSecondary: '#252525', bgTertiary: '#2d2d2d',
+    textPrimary: '#cccccc', textSecondary: '#999999', textMuted: '#666666',
+    border: '#404040', accent: '#007acc', error: '#f44747', success: '#89d185',
+  } as any;
 
   // Close on Escape key
   useEffect(() => {
