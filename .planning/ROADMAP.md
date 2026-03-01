@@ -26,7 +26,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. Ship Studio can load the plugin directly from the repo without any local build step
   2. plugin.json declares the correct id, name, description, toolbar slot, and required permissions
   3. dist/index.js is committed and reflects the latest build output
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Scaffold all template files and configure plugin manifest (SETUP-01, SETUP-02)
+- [ ] 01-02-PLAN.md — Install dependencies, build dist/index.js, and commit to repository (SETUP-03)
 
 ### Phase 2: Data + Toolbar
 **Goal**: The toolbar button appears in Ship Studio and clicking it fetches real usage data from ccusage via shell.exec, with loading, error, and cached states all handled
