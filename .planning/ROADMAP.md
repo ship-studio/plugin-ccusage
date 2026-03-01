@@ -29,7 +29,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Scaffold all template files and configure plugin manifest (SETUP-01, SETUP-02)
+- [x] 01-01-PLAN.md — Scaffold all template files and configure plugin manifest (SETUP-01, SETUP-02)
 - [ ] 01-02-PLAN.md — Install dependencies, build dist/index.js, and commit to repository (SETUP-03)
 
 ### Phase 2: Data + Toolbar
@@ -63,6 +63,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/? | Not started | - |
+| 1. Foundation | 1/2 | In progress | - |
 | 2. Data + Toolbar | 0/? | Not started | - |
 | 3. Modal UI | 0/? | Not started | - |
