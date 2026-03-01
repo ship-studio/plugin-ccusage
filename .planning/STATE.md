@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in_progress
-last_updated: "2026-03-01T09:43:00Z"
+last_updated: "2026-03-01T09:48:04Z"
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 5
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # Project State
@@ -23,28 +23,28 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 ## Current Position
 
 Phase: 2 of 3 (Data + Toolbar)
-Plan: 1 of 2 in current phase (completed)
+Plan: 2 of 2 in current phase (completed)
 Status: In progress
-Last activity: 2026-03-01 — Completed 02-01 (TypeScript types + useCcusageData hook)
+Last activity: 2026-03-01 — Completed 02-02 (toolbar icon, UsageModal, CSS injection, dist rebuild)
 
-Progress: [███░░░░░░░] 33%
+Progress: [████░░░░░░] 44%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 2 min
-- Total execution time: 5 min
+- Total plans completed: 4
+- Average duration: 1.75 min
+- Total execution time: 7 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 2 | 4 min | 2 min |
-| 02-data-toolbar | 1 | 1 min | 1 min |
+| 02-data-toolbar | 2 | 3 min | 1.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 2 min
+- Last 5 plans: 1.75 min
 - Trend: -
 
 *Updated after each plan completion*
@@ -67,6 +67,9 @@ Recent decisions affecting current work:
 - [02-01]: Promise.allSettled (not Promise.all) ensures 1-2 failed calls don't drop successful data
 - [02-01]: Partial success sets status='success' with error message — UI can show data alongside a warning
 - [02-01]: storage.read() callback typed as Record<string, unknown> for strict TypeScript noImplicitAny
+- [02-02]: DollarSign SVG uses Lucide icon path — universally recognized as cost/currency symbol
+- [02-02]: handleClick fetches only on idle or error — skips fetch if data already cached (preserves manual-refresh design)
+- [02-02]: CSS injected via useEffect with STYLE_ID guard to prevent duplicate style tags on re-mount
 
 ### Pending Todos
 
@@ -79,5 +82,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 02-01-PLAN.md (TypeScript interfaces + useCcusageData hook)
+Stopped at: Completed 02-02-PLAN.md (toolbar icon, UsageModal, CSS injection, dist/index.js rebuild)
 Resume file: None

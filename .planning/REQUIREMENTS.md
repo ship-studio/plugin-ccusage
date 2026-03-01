@@ -23,8 +23,8 @@
 
 ### UI - Toolbar
 
-- [ ] **TOOL-01**: Toolbar button renders with a recognizable usage/cost icon
-- [ ] **TOOL-02**: Clicking the toolbar button opens the usage modal
+- [x] **TOOL-01**: Toolbar button renders with a recognizable usage/cost icon
+- [x] **TOOL-02**: Clicking the toolbar button opens the usage modal
 
 ### UI - Modal
 
@@ -77,8 +77,8 @@
 | DATA-05 | Phase 2 | Complete |
 | DATA-06 | Phase 2 | Complete |
 | DATA-07 | Phase 2 | Complete |
-| TOOL-01 | Phase 2 | Pending |
-| TOOL-02 | Phase 2 | Pending |
+| TOOL-01 | Phase 2 | Complete |
+| TOOL-02 | Phase 2 | Complete |
 | MODAL-01 | Phase 3 | Pending |
 | MODAL-02 | Phase 3 | Pending |
 | MODAL-03 | Phase 3 | Pending |
