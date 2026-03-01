@@ -204,20 +204,10 @@ const pluginCSS = `
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  background: none !important;
-  border: none !important;
-  border-bottom: 2px solid transparent !important;
   margin-bottom: -1px;
-  opacity: 0.4;
-  transition: opacity 0.15s, border-color 0.15s;
-  color: inherit;
+  transition: opacity 0.15s;
 }
-.ccusage-tab:hover { opacity: 0.7; }
-.ccusage-tab--active {
-  opacity: 1;
-  border-bottom-color: var(--accent) !important;
-  color: var(--accent);
-}
+.ccusage-tab:hover { opacity: 0.8 !important; }
 .ccusage-body {
   flex: 1;
   min-height: 0;
@@ -496,16 +486,28 @@ function UsageModal({
           ] }),
           /* @__PURE__ */ jsx("button", { className: "ccusage-close", onClick: onClose, children: "✕" })
         ] }),
-        status === "success" && data && /* @__PURE__ */ jsx("div", { className: "ccusage-tabs", style: { borderBottom: `1px solid ${theme.border}` }, children: tabs.map((t) => /* @__PURE__ */ jsx(
-          "button",
-          {
-            className: `ccusage-tab ${tab === t.key ? "ccusage-tab--active" : ""}`,
-            style: { color: tab === t.key ? theme.accent : theme.textSecondary },
-            onClick: () => setTab(t.key),
-            children: t.label
-          },
-          t.key
-        )) }),
+        status === "success" && data && /* @__PURE__ */ jsx("div", { className: "ccusage-tabs", style: { borderBottom: `1px solid ${theme.border}` }, children: tabs.map((t) => {
+          const active = tab === t.key;
+          return /* @__PURE__ */ jsx(
+            "button",
+            {
+              className: "ccusage-tab",
+              style: {
+                color: active ? theme.accent : theme.textMuted,
+                opacity: active ? 1 : 0.5,
+                background: "none",
+                border: "none",
+                borderBottom: active ? `2px solid ${theme.accent}` : "2px solid transparent",
+                borderRadius: 0,
+                outline: "none",
+                boxShadow: "none"
+              },
+              onClick: () => setTab(t.key),
+              children: t.label
+            },
+            t.key
+          );
+        }) }),
         /* @__PURE__ */ jsxs("div", { className: "ccusage-body", children: [
           status === "loading" && /* @__PURE__ */ jsxs("div", { style: { textAlign: "center", padding: "40px 0", color: theme.textMuted }, children: [
             /* @__PURE__ */ jsx("div", { className: "ccusage-spinner", style: { borderTopColor: theme.accent } }),
