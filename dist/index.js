@@ -521,7 +521,25 @@ function UsageModal({
           status === "idle" && !data && /* @__PURE__ */ jsx("div", { className: "ccusage-empty", style: { color: theme.textMuted }, children: "Click Refresh to load your Claude Code usage data." })
         ] }),
         /* @__PURE__ */ jsxs("div", { className: "ccusage-footer", style: { borderTop: `1px solid ${theme.border}` }, children: [
-          /* @__PURE__ */ jsx("span", { style: { color: theme.textMuted }, children: (data == null ? void 0 : data.fetchedAt) ? `Updated ${timeAgo(data.fetchedAt)}` : "Not yet loaded" }),
+          /* @__PURE__ */ jsxs("div", { style: { display: "flex", flexDirection: "column", gap: 4 }, children: [
+            /* @__PURE__ */ jsx("span", { style: { color: theme.textMuted }, children: (data == null ? void 0 : data.fetchedAt) ? `Updated ${timeAgo(data.fetchedAt)}` : "Not yet loaded" }),
+            /* @__PURE__ */ jsx(
+              "a",
+              {
+                href: "https://github.com/ryoppippi/ccusage",
+                target: "_blank",
+                rel: "noopener noreferrer",
+                style: { color: theme.textMuted, fontSize: 10, opacity: 0.5, textDecoration: "none" },
+                onMouseEnter: (e) => {
+                  e.target.style.opacity = "0.8";
+                },
+                onMouseLeave: (e) => {
+                  e.target.style.opacity = "0.5";
+                },
+                children: "powered by ccusage"
+              }
+            )
+          ] }),
           /* @__PURE__ */ jsx(
             "button",
             {

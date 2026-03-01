@@ -653,9 +653,21 @@ function UsageModal({
 
         {/* Footer */}
         <div className="ccusage-footer" style={{ borderTop: `1px solid ${theme.border}` }}>
-          <span style={{ color: theme.textMuted }}>
-            {data?.fetchedAt ? `Updated ${timeAgo(data.fetchedAt)}` : 'Not yet loaded'}
-          </span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <span style={{ color: theme.textMuted }}>
+              {data?.fetchedAt ? `Updated ${timeAgo(data.fetchedAt)}` : 'Not yet loaded'}
+            </span>
+            <a
+              href="https://github.com/ryoppippi/ccusage"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: theme.textMuted, fontSize: 10, opacity: 0.5, textDecoration: 'none' }}
+              onMouseEnter={(e) => { (e.target as HTMLElement).style.opacity = '0.8'; }}
+              onMouseLeave={(e) => { (e.target as HTMLElement).style.opacity = '0.5'; }}
+            >
+              powered by ccusage
+            </a>
+          </div>
           <button
             className="ccusage-refresh"
             style={{ background: theme.action, color: theme.actionText }}
