@@ -67,34 +67,34 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SETUP-01 | — | Pending |
-| SETUP-02 | — | Pending |
-| SETUP-03 | — | Pending |
-| DATA-01 | — | Pending |
-| DATA-02 | — | Pending |
-| DATA-03 | — | Pending |
-| DATA-04 | — | Pending |
-| DATA-05 | — | Pending |
-| DATA-06 | — | Pending |
-| DATA-07 | — | Pending |
-| TOOL-01 | — | Pending |
-| TOOL-02 | — | Pending |
-| MODAL-01 | — | Pending |
-| MODAL-02 | — | Pending |
-| MODAL-03 | — | Pending |
-| MODAL-04 | — | Pending |
-| MODAL-05 | — | Pending |
-| MODAL-06 | — | Pending |
-| MODAL-07 | — | Pending |
-| MODAL-08 | — | Pending |
-| MODAL-09 | — | Pending |
-| MODAL-10 | — | Pending |
+| SETUP-01 | Phase 1 | Pending |
+| SETUP-02 | Phase 1 | Pending |
+| SETUP-03 | Phase 1 | Pending |
+| DATA-01 | Phase 2 | Pending |
+| DATA-02 | Phase 2 | Pending |
+| DATA-03 | Phase 2 | Pending |
+| DATA-04 | Phase 2 | Pending |
+| DATA-05 | Phase 2 | Pending |
+| DATA-06 | Phase 2 | Pending |
+| DATA-07 | Phase 2 | Pending |
+| TOOL-01 | Phase 2 | Pending |
+| TOOL-02 | Phase 2 | Pending |
+| MODAL-01 | Phase 3 | Pending |
+| MODAL-02 | Phase 3 | Pending |
+| MODAL-03 | Phase 3 | Pending |
+| MODAL-04 | Phase 3 | Pending |
+| MODAL-05 | Phase 3 | Pending |
+| MODAL-06 | Phase 3 | Pending |
+| MODAL-07 | Phase 3 | Pending |
+| MODAL-08 | Phase 3 | Pending |
+| MODAL-09 | Phase 3 | Pending |
+| MODAL-10 | Phase 3 | Pending |
 
 **Coverage:**
 - v1 requirements: 22 total
-- Mapped to phases: 0
-- Unmapped: 22 ⚠️
+- Mapped to phases: 22
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-01*
-*Last updated: 2026-03-01 after initial definition*
+*Last updated: 2026-03-01 after roadmap creation*
