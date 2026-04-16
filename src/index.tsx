@@ -10,8 +10,12 @@ function usePluginContext() {
   const React = _w.__SHIPSTUDIO_REACT__;
   const CtxRef = _w.__SHIPSTUDIO_PLUGIN_CONTEXT_REF__;
   if (CtxRef && React?.useContext) {
-    return React.useContext(CtxRef) as any | null;
+    const ctx = React.useContext(CtxRef) as any | null;
+    if (ctx) return ctx;
   }
+  // Fall back to legacy global
+  const directCtx = _w.__SHIPSTUDIO_PLUGIN_CONTEXT__ as any | undefined;
+  if (directCtx) return directCtx;
   return null;
 }
 
